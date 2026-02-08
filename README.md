@@ -35,7 +35,7 @@ NeverPay lets users deposit USDC, earn credits from yield (via Aave), and spend 
                           │
                           ▼
 ┌──────────────────────────────────────────────────────┐
-│             Smart Contracts (Base Mainnet)            │
+│           Smart Contracts (Base Sepolia testnet)       │
 │  ┌────────────────────────────────────────────────┐   │
 │  │  YieldVault.sol                                │   │
 │  │  - USDC deposits → Aave aUSDC                  │   │
@@ -45,7 +45,7 @@ NeverPay lets users deposit USDC, earn credits from yield (via Aave), and spend 
 └──────────────────────────────────────────────────────┘
                           │
                           ▼
-         Base Mainnet · Aave V3 · LI.FI Bridge
+      Base Sepolia · Aave V3 · LI.FI Bridge (→ Base mainnet)
 ```
 
 ## Credit Formula
@@ -57,19 +57,20 @@ Example: $100 USDC deposit → 4,000 credits
 Each image or chat message costs 1 credit
 ```
 
-## Contract Addresses (Base Mainnet)
+## Contract Addresses (Base Sepolia)
 
 | Contract | Address |
 |----------|---------|
-| YieldVault | set via `NEXT_PUBLIC_YIELD_VAULT_ADDRESS` |
-| USDC | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` |
+| PlatformRegistry | `0x07fCEb495F07da17a5C5748dfCD89d006048a014` |
+| YieldVault | `0x78232D60f2F09540dFa9C34CeC1942ae08F9900c` |
+| USDC | `0x036CbD53842c5426634e7929541eC2318f3dCF7e` |
 
 ## Quick Start
 
 ### Prerequisites
 - Node.js 18+
 - MetaMask or any EVM wallet
-- Base mainnet USDC
+- Base Sepolia ETH (from [faucet](https://www.coinbase.com/faucets/base-ethereum-goerli-faucet)) and Base Sepolia USDC
 
 ### Installation
 
@@ -93,7 +94,7 @@ NEXT_PUBLIC_YIELD_VAULT_ADDRESS=
 # Server-side (API routes)
 GEMINI_API_KEY=
 YIELD_VAULT_ADDRESS=
-RPC_URL=https://mainnet.base.org
+RPC_URL=https://sepolia.base.org
 BACKEND_PRIVATE_KEY=
 ```
 
@@ -102,7 +103,7 @@ BACKEND_PRIVATE_KEY=
 ```bash
 cd contracts
 npm install
-npx hardhat run scripts/deploy.js --network base
+PRIVATE_KEY=0x... npx hardhat run scripts/deploy.js --network baseSepolia
 ```
 
 ## Project Structure
