@@ -8,10 +8,11 @@ createConfig({
   integrator: 'NeverPay',
   providers: [
     EVM({
-      getWalletClient: () => getWalletClient(wagmiConfig),
+      getWalletClient: (chainId) =>
+        getWalletClient(wagmiConfig, chainId ? { chainId: chainId as unknown as 1 } : undefined),
       switchChain: async (chainId) => {
         const chain = await switchChain(wagmiConfig, { chainId: chainId as unknown as 1 });
-        return getWalletClient(wagmiConfig, { chainId: chain.id });
+        return getWalletClient(wagmiConfig, { chainId: chain.id as unknown as 1 });
       },
     }),
   ],
