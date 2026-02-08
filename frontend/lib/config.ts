@@ -10,11 +10,11 @@ export const config = getDefaultConfig({
   chains: [baseSepolia, mainnet, polygon, arbitrum, optimism, bsc],
   transports: {
     [baseSepolia.id]: http('https://sepolia.base.org'),
-    [mainnet.id]: http(),
-    [polygon.id]: http(),
-    [arbitrum.id]: http(),
-    [optimism.id]: http(),
-    [bsc.id]: http(),
+    [mainnet.id]: http('https://ethereum.publicnode.com'),
+    [polygon.id]: http('https://polygon-rpc.com'),
+    [arbitrum.id]: http('https://arb1.arbitrum.io/rpc'),
+    [optimism.id]: http('https://mainnet.optimism.io'),
+    [bsc.id]: http('https://bsc-dataseed.binance.org'),
   },
   ssr: true,
 });

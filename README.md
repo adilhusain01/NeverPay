@@ -4,11 +4,11 @@
 
 ## Overview
 
-NeverPay lets users deposit USDC, earn credits from yield (via Aave), and spend those credits on AI services — while keeping the ability to withdraw their principal at any time.
+NeverPay lets users deposit USDC, earn credits from yield (via Aave), and spend those credits on services - while keeping the ability to withdraw their principal at any time.
 
 ## Key Features
 
-- **Deposit & Earn** — Stake USDC to receive AI credits (50 credits per $1, 20% platform margin)
+- **Deposit & Earn** — Stake USDC to receive credits (50 credits per $1, 20% platform margin)
 - **Yield Farming** — Deposits flow into Aave for continuous yield generation
 - **AI Image Generation** — Generate images via Gemini 2.5 Flash
 - **AI Chat** — Multi-turn conversations via Gemini 2.0 Flash
