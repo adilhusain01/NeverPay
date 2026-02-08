@@ -1,134 +1,126 @@
-# NeverPay 🎨💰
+# NeverPay
 
-> DeFi-powered AI Image Generation Platform - HackMoney 2026
+> DeFi-powered AI platform — deposit once, use forever.
 
-## 🌟 Overview
+## Overview
 
-NeverPay revolutionizes access to services by combining DeFi yield farming with credits. Users deposit stablecoins, earn credits through yield optimization, and spend them on platforms while retaining the ability to withdraw their original deposit at any time.
+NeverPay lets users deposit USDC, earn credits from yield (via Aave), and spend those credits on AI services — while keeping the ability to withdraw their principal at any time.
 
-## 🔑 Key Features
+## Key Features
 
-- **Deposit & Earn**: Stake USDC to receive AI credits calculated via yield-optimized algorithms
-- **Yield Farming**: Deposits are automatically allocated to DeFi protocols (Aave) for yield generation
-- **Service Usability**: Generate images using Google's Gemini API with earned credits
-- **Full Withdrawal**: Withdraw your entire principal anytime (credits are revoked)
-- **Transparent Dashboard**: Real-time view of deposits, credits, yields, and usage
+- **Deposit & Earn** — Stake USDC to receive AI credits (50 credits per $1, 20% platform margin)
+- **Yield Farming** — Deposits flow into Aave for continuous yield generation
+- **AI Image Generation** — Generate images via Gemini 2.5 Flash
+- **AI Chat** — Multi-turn conversations via Gemini 2.0 Flash
+- **Cross-chain Deposits** — Bridge any token from any chain to Base USDC via LI.FI
+- **Full Withdrawal** — Withdraw principal anytime (credits revoked on withdrawal)
+- **Real-time Dashboard** — Live view of deposits, credits, yield earned, and usage
 
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Frontend (Next.js)                       │
-│   ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│   │ Wallet Auth  │  │  Dashboard   │  │  Image Generation    │  │
-│   │  (wagmi)     │  │  (Credits,   │  │  (Prompt → Image)    │  │
-│   │              │  │   Yields)    │  │                      │  │
-│   └──────────────┘  └──────────────┘  └──────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Backend (Node.js/Express)                   │
-│   ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│   │ Credit Mgmt  │  │ Gemini API   │  │  Yield Calculator    │  │
-│   │              │  │  Integration │  │                      │  │
-│   └──────────────┘  └──────────────┘  └──────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Smart Contracts (Solidity)                    │
-│   ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│   │ YieldVault   │  │ CreditManager│  │  Aave Integration    │  │
-│   │ (Deposits)   │  │ (Credits)    │  │  (Yield Farming)     │  │
-│   └──────────────┘  └──────────────┘  └──────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Ethereum Sepolia Testnet / Circle USDC              │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-## 💰 Credit Algorithm
+## Architecture
 
 ```
-Base Credits = Deposit Amount / API Cost Per Generation
-Yield Bonus = (APY * Deposit * Time Factor) / API Cost
-Total Credits = Base Credits + Yield Bonus
-Platform Margin = 20% (ensures profitability)
-
-Example: 100 USDC deposit @ 5% APY
-- Base Credits: 100 / 0.02 = 5,000 images
-- Monthly Yield Bonus: (0.05 * 100 * 1/12) / 0.02 ≈ 21 images
-- Net Credits (after margin): ~4,000 images
+┌──────────────────────────────────────────────────────┐
+│               Frontend (Next.js App Router)           │
+│  ┌────────────┐  ┌────────────┐  ┌────────────────┐  │
+│  │ Wallet     │  │ Dashboard  │  │ Marketplace    │  │
+│  │ (wagmi +   │  │ (Credits,  │  │ (AI platforms) │  │
+│  │  Rainbow)  │  │  Yields)   │  │                │  │
+│  └────────────┘  └────────────┘  └────────────────┘  │
+│                                                       │
+│  ┌────────────────────────────────────────────────┐   │
+│  │           Next.js API Routes                   │   │
+│  │  /api/generate  /api/chat  /api/credits/:addr  │   │
+│  └────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌──────────────────────────────────────────────────────┐
+│             Smart Contracts (Base Mainnet)            │
+│  ┌────────────────────────────────────────────────┐   │
+│  │  YieldVault.sol                                │   │
+│  │  - USDC deposits → Aave aUSDC                  │   │
+│  │  - Credit minting / deduction                  │   │
+│  │  - Yield accrual tracking                      │   │
+│  └────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────┘
+                          │
+                          ▼
+         Base Mainnet · Aave V3 · LI.FI Bridge
 ```
 
-## 🎯 Hackathon Targets
+## Credit Formula
 
-- **Circle Prize ($10k)**: USDC integration for deposits/withdrawals
-- **Sui Prize ($10k)**: Cross-chain compatibility potential
-- **Yellow Prize ($15k)**: State channel optimization for microtransactions
+```
+Credits = deposit_usdc × 50 × 0.8 (platform margin)
 
-## 🚀 Quick Start
+Example: $100 USDC deposit → 4,000 credits
+Each image or chat message costs 1 credit
+```
+
+## Contract Addresses (Base Mainnet)
+
+| Contract | Address |
+|----------|---------|
+| YieldVault | set via `NEXT_PUBLIC_YIELD_VAULT_ADDRESS` |
+| USDC | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` |
+
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+
-- MetaMask wallet
-- Sepolia testnet ETH (from faucet)
+- MetaMask or any EVM wallet
+- Base mainnet USDC
 
 ### Installation
 
 ```bash
-# Install dependencies
-cd contracts && npm install
-cd ../backend && npm install
-cd ../frontend && npm install
+cd frontend
+npm install
+cp .env.example .env.local
+# Fill in GEMINI_API_KEY, NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+# NEXT_PUBLIC_YIELD_VAULT_ADDRESS, YIELD_VAULT_ADDRESS, BACKEND_PRIVATE_KEY
 
-# Setup environment
-cp .env.example .env
-# Add your GEMINI_API_KEY, PRIVATE_KEY, etc.
-
-# Deploy contracts (Sepolia)
-cd contracts && npx hardhat run scripts/deploy.js --network sepolia
-
-# Start backend
-cd ../backend && npm run dev
-
-# Start frontend
-cd ../frontend && npm run dev
+npm run dev
 ```
 
-## 📁 Project Structure
+### Environment Variables
+
+```env
+# Client-side
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
+NEXT_PUBLIC_YIELD_VAULT_ADDRESS=
+
+# Server-side (API routes)
+GEMINI_API_KEY=
+YIELD_VAULT_ADDRESS=
+RPC_URL=https://mainnet.base.org
+BACKEND_PRIVATE_KEY=
+```
+
+### Deploy Contracts
+
+```bash
+cd contracts
+npm install
+npx hardhat run scripts/deploy.js --network base
+```
+
+## Project Structure
 
 ```
-yieldcredit-ai/
-├── contracts/           # Solidity smart contracts
-│   ├── YieldVault.sol   # Main deposit/withdrawal logic
-│   ├── CreditManager.sol# Credit calculation & tracking
-│   └── mocks/           # Test tokens for development
-├── frontend/            # Next.js frontend
-│   ├── components/      # React components
-│   ├── hooks/           # Custom hooks (wallet, contracts)
-│   └── pages/           # App pages
-├── backend/             # Express.js API server
-│   ├── routes/          # API endpoints
-│   ├── services/        # Gemini, yield calculation
-│   └── middleware/      # Auth, rate limiting
+NeverPay/
+├── contracts/          # Solidity — YieldVault with Aave integration
+├── frontend/           # Next.js 16 (App Router)
+│   ├── app/
+│   │   ├── api/        # generate, chat, credits, health
+│   │   ├── marketplace/
+│   │   └── platform/   # yieldcredit-ai, gemini-chat
+│   ├── components/     # Dashboard, DepositForm, BridgeDeposit, etc.
+│   ├── contexts/       # DashboardContext
+│   └── lib/            # config, contracts, lifi, contract helpers
 └── README.md
 ```
 
-## 🔐 Security Considerations
+## License
 
-- Deposits held in audited Aave protocol
-- Rate limiting on image generation
-- Withdrawal delays for large amounts
-- 10% reserve fund for volatility protection
-
-## 📄 License
-
-MIT License - Built for HackMoney 2026
-
-## 👥 Team
-
-Built with ❤️ for ETHGlobal HackMoney 2026
+MIT — Built for ETHGlobal HackMoney 2026
