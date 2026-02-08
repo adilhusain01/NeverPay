@@ -2,7 +2,7 @@
 
 import '@/lib/lifi';
 import { useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 import { getQuote, convertQuoteToRoute, executeRoute } from '@lifi/sdk';
 import type { Route } from '@lifi/sdk';
 
@@ -105,7 +105,8 @@ const TOKENS_BY_CHAIN: Record<number, Token[]> = {
 type BridgeStatus = 'idle' | 'quoting' | 'quoted' | 'bridging' | 'done' | 'error';
 
 export default function BridgeDeposit() {
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
   const [fromChainId, setFromChainId] = useState(1);
   const [fromToken, setFromToken] = useState<Token>(TOKENS_BY_CHAIN[1][0]);
   const [amount, setAmount] = useState('');
@@ -181,8 +182,28 @@ export default function BridgeDeposit() {
     setError('');
 
     try {
+      // Check if wallet is on the correct chain
+      if (chain?.id !== fromChainId) {
+        setStatusText(`Switching to ${selectedChain.name}...`);
+        try {
+          await switchChainAsync({ chainId: fromChainId });
+          setStatusText('Chain switched. Preparing bridge...');
+        } catch (switchError) {
+          const switchMessage = (switchError as Error).message || '';
+          if (switchMessage.includes('User rejected') || switchMessage.includes('user rejected')) {
+            setError('Chain switch cancelled. Please switch to the source chain to continue.');
+          } else {
+            setError(`Failed to switch chain: ${switchMessage}`);
+          }
+          setStatus('error');
+          setStatusText('');
+          return;
+        }
+      }
+
       const route = convertQuoteToRoute(quote);
       setActiveRoute(route);
+      setStatusText('Executing bridge transaction...');
 
       await executeRoute(route, {
         updateRouteHook(updatedRoute) {
@@ -206,6 +227,9 @@ export default function BridgeDeposit() {
         setError('Transaction cancelled. You rejected the transaction in your wallet.');
       } else if (errorMessage.includes('insufficient funds')) {
         setError('Insufficient funds. Check your balance and try again.');
+      } else if (errorMessage.includes('does not match') || errorMessage.includes('chain')) {
+        const chainName = SOURCE_CHAINS.find(c => c.id === fromChainId)?.name || 'the source chain';
+        setError(`Please switch your wallet to ${chainName} and try again.`);
       } else if (errorMessage.includes('network')) {
         setError('Network error. Please check your connection and try again.');
       } else {
@@ -346,6 +370,19 @@ export default function BridgeDeposit() {
           </div>
         )}
       </div>
+
+      {/* Chain warning */}
+      {chain && chain.id !== fromChainId && status === 'quoted' && (
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-[rgba(251,191,36,0.1)] border border-[rgba(251,191,36,0.2)]">
+          <span className="text-lg">⚠️</span>
+          <div className="flex-1">
+            <p className="text-xs font-medium text-[#fbbf24]">Wrong network detected</p>
+            <p className="text-xs text-[#fde68a] mt-0.5">
+              You'll be prompted to switch to {selectedChain.name} when you start the bridge.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Status */}
       {statusText && status === 'bridging' && (
