@@ -156,7 +156,21 @@ export default function BridgeDeposit() {
       setQuote(q);
       setStatus('quoted');
     } catch (e) {
-      setError((e as Error).message || 'Failed to get quote');
+      const errorMessage = (e as Error).message || 'Failed to get quote';
+      
+      // Handle user-friendly error messages
+      if (errorMessage.includes('network') || errorMessage.includes('Network')) {
+        setError('Network error. Please check your connection and try again.');
+      } else if (errorMessage.includes('amount') || errorMessage.includes('Amount')) {
+        setError('Invalid amount. Please enter a valid amount.');
+      } else {
+        // Show a simplified error message
+        const shortError = errorMessage.length > 100 
+          ? errorMessage.substring(0, 100) + '...' 
+          : errorMessage;
+        setError(shortError);
+      }
+      
       setStatus('error');
     }
   };
@@ -185,8 +199,25 @@ export default function BridgeDeposit() {
       setStatus('done');
       setStatusText('Bridge complete! USDC is now on Base.');
     } catch (e) {
-      setError((e as Error).message || 'Bridge failed');
+      const errorMessage = (e as Error).message || 'Bridge failed';
+      
+      // Handle user-friendly error messages
+      if (errorMessage.includes('User rejected') || errorMessage.includes('user rejected')) {
+        setError('Transaction cancelled. You rejected the transaction in your wallet.');
+      } else if (errorMessage.includes('insufficient funds')) {
+        setError('Insufficient funds. Check your balance and try again.');
+      } else if (errorMessage.includes('network')) {
+        setError('Network error. Please check your connection and try again.');
+      } else {
+        // Show a simplified error message
+        const shortError = errorMessage.length > 100 
+          ? errorMessage.substring(0, 100) + '...' 
+          : errorMessage;
+        setError(shortError);
+      }
+      
       setStatus('error');
+      setStatusText('');
     }
   };
 
@@ -338,9 +369,23 @@ export default function BridgeDeposit() {
       )}
 
       {error && (
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.2)]">
-          <span>⚠️</span>
-          <p className="text-xs text-[#ef4444]">{error}</p>
+        <div className="rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.2)] p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-lg flex-shrink-0">⚠️</span>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-[#ef4444] mb-1">Transaction Failed</p>
+              <p className="text-xs text-[#fca5a5]">{error}</p>
+            </div>
+            <button
+              onClick={() => {
+                setError('');
+                setStatus('quoted');
+              }}
+              className="text-xs text-[#ef4444] hover:text-[#fca5a5] underline flex-shrink-0"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       )}
 
