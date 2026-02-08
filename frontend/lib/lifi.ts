@@ -10,7 +10,7 @@ createConfig({
     EVM({
       getWalletClient: () => getWalletClient(wagmiConfig),
       switchChain: async (chainId) => {
-        const chain = await switchChain(wagmiConfig, { chainId: chainId as number });
+        const chain = await switchChain(wagmiConfig, { chainId: chainId as unknown as 1 });
         return getWalletClient(wagmiConfig, { chainId: chain.id });
       },
     }),
